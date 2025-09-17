@@ -42,7 +42,14 @@ public class PostController {
         Category category = categoryRepository.findById(postData.getCategory().getId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        Post post = postService.createPost(postData.getTitle(), postData.getContent(), author, category);
+        Post post = postService.createPost(
+                postData.getTitle(),
+                postData.getContent(),
+                postData.getImages(),
+                postData.getLinks(),
+                author,
+                category
+        );
         return ResponseEntity.ok(postMapper.toDTO(post));
     }
 

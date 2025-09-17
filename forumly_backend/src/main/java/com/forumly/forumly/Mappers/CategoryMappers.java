@@ -4,12 +4,10 @@ import com.forumly.forumly.dto.CategoryDTO;
 import com.forumly.forumly.entity.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
-public interface  CategoryMappers {
-    CategoryMappers INSTANCE = Mappers.getMapper(CategoryMappers.class);
+public interface CategoryMappers {
 
-     @Mapping(target = "postCount", expression = "java(category.getPosts().size())")
+    @Mapping(target = "postCount", expression = "java(category.getPosts().size())")
     CategoryDTO toDTO(Category category);
 }
