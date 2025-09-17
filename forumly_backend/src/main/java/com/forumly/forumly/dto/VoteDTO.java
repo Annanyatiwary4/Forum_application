@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class VoteDTO {
     private Long id;
-    private UserDTO user;
+    private Long postId;
+    private String username;
     private String type; // UPVOTE / DOWNVOTE
 }

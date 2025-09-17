@@ -11,8 +11,8 @@ public class PostDTO {
     private String content;
     private List<String> images;
     private List<String> links;
-    private UserDTO author;
-    private CategoryDTO category;
+    private String author;
+    private Long categoryId;
     private List<CommentDTO> comments;   // nested comments
     private int upvotes;
     private int downvotes;

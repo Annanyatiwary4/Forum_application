@@ -8,8 +8,9 @@ import java.util.List;
 public class CommentDTO {
     private Long id;
     private String content;
-    private UserDTO author;
-    private CommentDTO parentComment;
+    private String author;
+    private Long postId;
+    private Long parentCommentId;
     private List<CommentDTO> replies;
     private LocalDateTime createdAt;
 }
