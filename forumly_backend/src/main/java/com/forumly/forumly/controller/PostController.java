@@ -34,19 +34,19 @@ public class PostController {
 
     // Create Post
     @PostMapping
-    public ResponseEntity<PostDTO> createPost(@RequestBody Post postData, Authentication authentication) {
+    public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO dto, Authentication authentication) {
         String username = authentication.getName();
         User author = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Category category = categoryRepository.findById(postData.getCategory().getId())
+        Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
         Post post = postService.createPost(
-                postData.getTitle(),
-                postData.getContent(),
-                postData.getImages(),
-                postData.getLinks(),
+                dto.getTitle(),
+                dto.getContent(),
+                dto.getImages(),
+                dto.getLinks(),
                 author,
                 category
         );
@@ -57,8 +57,41 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<PostDTO> getPost(@PathVariable Long id) {
         Post post = postService.getPostById(id);
-        return ResponseEntity.ok(postMapper.toDTO(post));
+        return ResponseEntity.ok(postService.mapPostToDTO(post));
     }
+
+
+    // ✅ Update Post (only author can update)
+    @PutMapping("/{id}")
+    public ResponseEntity<PostDTO> updatePost(@PathVariable Long id,
+                                              @RequestBody PostDTO dto,
+                                              Authentication authentication) {
+        Post existingPost = postService.getPostById(id);
+        String username = authentication.getName();
+
+        if (!existingPost.getAuthor().getUsername().equals(username)) {
+            return ResponseEntity.status(403).body(null); // forbidden
+        }
+
+        Category category = null;
+        if (dto.getCategoryId() != null) {
+            category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+        }
+
+        Post updatedPost = postService.updatePost(
+                existingPost,
+                dto.getTitle(),
+                dto.getContent(),
+                dto.getImages(),
+                dto.getLinks(),
+                category
+        );
+
+        return ResponseEntity.ok(postMapper.toDTO(updatedPost));
+    }
+
+
 
     // Delete Post (only by author)
     @DeleteMapping("/{id}")
@@ -82,7 +115,7 @@ public class PostController {
 
         List<Post> posts = postService.getPostsByCategory(category);
         List<PostDTO> postDTOs = posts.stream()
-                .map(postMapper::toDTO)
+                .map(postService::mapPostToDTO)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(postDTOs);

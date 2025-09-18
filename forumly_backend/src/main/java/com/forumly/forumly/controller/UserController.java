@@ -25,6 +25,8 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // ✅ Get own profile
+
     @GetMapping("/me")
     public ResponseEntity<User> getMyProfile(Authentication authentication) {
         String username = authentication.getName();
@@ -33,6 +35,8 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    // ✅ Get user by ID (public profile)
+
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = userRepository.findById(id)
@@ -40,6 +44,8 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+
+    // ✅ Update user profile (only owner can update)
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id,
                                            @RequestBody User updatedUser,

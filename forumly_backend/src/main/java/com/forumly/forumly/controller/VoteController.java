@@ -29,6 +29,8 @@ public class VoteController {
     @Autowired
     private VoteMappers voteMapper;
 
+
+    // Vote on a post
     @PostMapping
     public ResponseEntity<VoteDTO> vote(
             @RequestParam Long postId,

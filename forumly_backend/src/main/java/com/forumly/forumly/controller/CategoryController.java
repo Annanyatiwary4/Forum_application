@@ -30,6 +30,8 @@ public class CategoryController {
     @Autowired
     private PostMappers postMapper;
 
+
+    //get all categories
     @GetMapping
     public ResponseEntity<List<CategoryDTO>> getAllCategories() {
         List<CategoryDTO> dtos = categoryService.getAllCategories().stream()
@@ -38,11 +40,14 @@ public class CategoryController {
         return ResponseEntity.ok(dtos);
     }
 
+    //create category
     @PostMapping
     public ResponseEntity<CategoryDTO> createCategory(@RequestBody Category category) {
         Category saved = categoryService.createCategory(category);
         return ResponseEntity.ok(categoryMapper.toDTO(saved));
     }
+
+    //get posts by category id
         @GetMapping("/{id}/posts")
             public ResponseEntity<List<PostDTO>> getPostsByCategory(@PathVariable Long id) {
                 Category category = categoryService.getCategoryById(id);
