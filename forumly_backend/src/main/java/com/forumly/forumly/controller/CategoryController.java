@@ -9,11 +9,11 @@ import com.forumly.forumly.dto.PostDTO;
 import com.forumly.forumly.Mappers.CategoryMappers;
 import com.forumly.forumly.Mappers.PostMappers;
 import com.forumly.forumly.entity.Category;
-import com.forumly.forumly.entity.Post;
+
 import java.util.List;
+
 import com.forumly.forumly.service.CategoryService;
 
-import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
