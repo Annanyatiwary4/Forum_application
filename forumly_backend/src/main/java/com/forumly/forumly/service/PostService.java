@@ -8,6 +8,7 @@ import com.forumly.forumly.entity.Category;
 import com.forumly.forumly.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.forumly.forumly.entity.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +51,7 @@ public class PostService {
     public List<Post> getPostsByCategory(Category category) {
         List<Post> posts = postRepository.findByCategory(category);
 
-        posts.forEach(this::mapCommentsRecursively);
+        posts.forEach(this::mapCommentsRecursivelyForDto);
 
         return posts;
     }
@@ -60,7 +61,7 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        mapCommentsRecursively(post);
+        mapCommentsRecursivelyForDto(post);
 
         return post;
     }
@@ -70,20 +71,14 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    // 🔹 Helper method: maps top-level comments and their nested replies
-    private void mapCommentsRecursively(Post post) {
-        List<CommentDTO> topLevelComments = post.getComments().stream()
+    // 🔹 Map comments for DTO safely (does not touch entity)
+    public List<CommentDTO> mapCommentsRecursivelyForDto(Post post) {
+        return post.getComments().stream()
                 .filter(c -> c.getParentComment() == null)
                 .map(this::mapCommentWithReplies)
                 .collect(Collectors.toList());
-
-        // You can store these DTOs somewhere or use MapStruct to map them
-        // For now, just reset the post's comments list to top-level comments
-        // Optionally, you could create a separate field for DTOs
-        post.setComments(post.getComments().stream()
-                .filter(c -> c.getParentComment() == null)
-                .collect(Collectors.toList()));
     }
+
 
     private CommentDTO mapCommentWithReplies(Comment comment) {
         CommentDTO dto = commentMapper.toDTO(comment);
@@ -95,4 +90,11 @@ public class PostService {
         dto.setReplies(replies);
         return dto;
     }
+
+    
+        // ✅ Get posts by author (used for "my posts")
+    public List<Post> getPostsByAuthor(User author) {
+        return postRepository.findByAuthor(author);
+    }
+
 }

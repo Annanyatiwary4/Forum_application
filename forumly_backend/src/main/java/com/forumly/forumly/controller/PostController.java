@@ -88,7 +88,11 @@ public class PostController {
                 category
         );
 
-        return ResponseEntity.ok(postMapper.toDTO(updatedPost)); // just use mapper
+        // ✅ Map comments for response only
+    PostDTO response = postMapper.toDTO(updatedPost);
+    response.setComments(postService.mapCommentsRecursivelyForDto(updatedPost));
+
+    return ResponseEntity.ok(response);
     }
 
     // Delete Post
@@ -116,4 +120,19 @@ public class PostController {
 
         return ResponseEntity.ok(postDTOs);
     }
+
+    // Get all posts by the logged-in user
+        @GetMapping("/my-posts")
+        public ResponseEntity<List<PostDTO>> getMyPosts(Authentication authentication) {
+            String username = authentication.getName();
+            
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            List<Post> myPosts = postService.getPostsByAuthor(user); // we'll add this service method
+            List<PostDTO> postDTOs = postMapper.toDtoList(myPosts);
+
+            return ResponseEntity.ok(postDTOs);
+        }
+
 }
