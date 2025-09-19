@@ -50,18 +50,18 @@ public class PostController {
                 author,
                 category
         );
-        return ResponseEntity.ok(postMapper.toDTO(post));
+
+        return ResponseEntity.ok(postMapper.toDTO(post)); // just use mapper
     }
 
     // Get Post by ID
     @GetMapping("/{id}")
     public ResponseEntity<PostDTO> getPost(@PathVariable Long id) {
-        Post post = postService.getPostById(id);
-        return ResponseEntity.ok(postService.mapPostToDTO(post));
+        Post post = postService.getPostById(id); // service handles nested replies
+        return ResponseEntity.ok(postMapper.toDTO(post)); // use mapper
     }
 
-
-    // ✅ Update Post (only author can update)
+    // Update Post
     @PutMapping("/{id}")
     public ResponseEntity<PostDTO> updatePost(@PathVariable Long id,
                                               @RequestBody PostDTO dto,
@@ -70,7 +70,7 @@ public class PostController {
         String username = authentication.getName();
 
         if (!existingPost.getAuthor().getUsername().equals(username)) {
-            return ResponseEntity.status(403).body(null); // forbidden
+            return ResponseEntity.status(403).body(null);
         }
 
         Category category = null;
@@ -88,12 +88,10 @@ public class PostController {
                 category
         );
 
-        return ResponseEntity.ok(postMapper.toDTO(updatedPost));
+        return ResponseEntity.ok(postMapper.toDTO(updatedPost)); // just use mapper
     }
 
-
-
-    // Delete Post (only by author)
+    // Delete Post
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePost(@PathVariable Long id, Authentication authentication) {
         Post post = postService.getPostById(id);
@@ -113,10 +111,8 @@ public class PostController {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        List<Post> posts = postService.getPostsByCategory(category);
-        List<PostDTO> postDTOs = posts.stream()
-                .map(postService::mapPostToDTO)
-                .collect(Collectors.toList());
+        List<Post> posts = postService.getPostsByCategory(category); // nested replies populated
+        List<PostDTO> postDTOs = postMapper.toDtoList(posts);        // just use mapper
 
         return ResponseEntity.ok(postDTOs);
     }

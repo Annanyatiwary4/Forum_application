@@ -5,7 +5,7 @@ import com.forumly.forumly.entity.Post;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import java.util.List;
-import com.forumly.forumly.util.Commentutils;
+
 
 @Mapper(componentModel = "spring", uses = {CommentMappers.class})
 public interface PostMappers {
@@ -23,8 +23,5 @@ public interface PostMappers {
     @Mapping(target = "votes", ignore = true)
     Post toEntity(PostDTO dto);
 
-    default PostDTO toFilteredDTO(Post post) {
-        Commentutils.filterTopLevelComments(post); // ✅ clean comments before mapping
-        return toDTO(post);
-    }
+    
 }
