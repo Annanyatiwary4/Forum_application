@@ -3,7 +3,7 @@ import { OrbitingCircles } from "./ui/orbiting-circles";
 
 export default function HeroSection() {
   return (
-    <section className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-gradient-to-b from-gray-50 to-gray-200 dark:from-black dark:to-gray-900">
+    <section className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-amber-200 dark:bg-gray-900">
       {/* Orbiting Circles */}
  
 <OrbitingCircles iconSize={100} radius={300} speed={0.3}>
@@ -29,7 +29,7 @@ export default function HeroSection() {
           Forumly
         </h1>
         <p className="mt-4 text-lg md:text-xl text-gray-600 dark:text-gray-300">
-          A modern space to share ideas & build community 🚀
+          The blueprint for your next great idea isn't in a file—it's in a conversation.
         </p>
       </div>
     </section>
