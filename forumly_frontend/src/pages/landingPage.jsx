@@ -28,7 +28,7 @@ const LandingPage = () => {
          <Features />
         
         </section>
-        <section id="menu" className=" min-h-screen w-full py-20 px-5 md:px-10  bg-slate-900">
+        <section id="menu" className=" min-h-screen w-full py-20 px-5 md:px-10  bg-slate-950">
          
          <Menu />
         </section>

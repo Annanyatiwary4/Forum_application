@@ -121,13 +121,10 @@ const features = [
 
 export function FeaturesCard() {
   return (
-     <div className="bg-blue-950 text-white p-12 md:p-20 rounded-3xl shadow-lg max-w-full   border-2 border-gray-50">
-      {/* The padding makes it stand out, rounded corners and shadow for depth */}
-      <BentoGrid>
-        {features.map((feature, idx) => (
-          <BentoCard key={idx} {...feature} />
-        ))}
-      </BentoGrid>
-    </div>
+    <BentoGrid>
+      {features.map((feature, idx) => (
+        <BentoCard key={idx} {...feature} />
+      ))}
+    </BentoGrid>
   );
 }
