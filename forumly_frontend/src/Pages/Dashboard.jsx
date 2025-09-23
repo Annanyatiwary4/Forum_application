@@ -14,10 +14,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
+import { useNavigate } from "react-router-dom";
+
 
 const Dashboard = () => {
   const [query, setQuery] = useState("");
   const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
+
 
   const handleChange = (e) => setQuery(e.target.value);
   const handleSubmit = (e) => {
@@ -102,6 +106,7 @@ const Dashboard = () => {
             {categories.map((cat, idx) => (
               <li
                 key={idx}
+                 onClick={() => navigate(`/posts/category/${cat.id}`)}
                 className="group flex flex-col justify-between cursor-pointer rounded-lg border border-amber-200/30 bg-slate-800 p-4 text-lg font-medium 
                           transition-all duration-300 ease-in-out
                           hover:bg-amber-200 hover:shadow-xl"
