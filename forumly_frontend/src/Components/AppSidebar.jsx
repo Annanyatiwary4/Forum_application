@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   IconArrowLeft,
   IconBrandTabler,
@@ -9,8 +9,27 @@ import {
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarBody, SidebarLink } from "./ui/sidebar";
+import { useNavigate } from "react-router-dom";
+
 
 export function AppSidebar({ children }) {
+
+  const navigate=useNavigate();
+
+  const [username, setUsername] = useState("");
+
+  // Fetch logged-in username from localStorage (or wherever you store it)
+  useEffect(() => {
+    const user = localStorage.getItem("username"); // must match your login storage
+    if (user) setUsername(user);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");    // remove JWT token
+    localStorage.removeItem("username"); // remove stored username
+    navigate("/login");                // redirect to login page
+  };
+
   const links = [
     {
       label: "Dashboard",
@@ -39,6 +58,7 @@ export function AppSidebar({ children }) {
       icon: (
         <IconArrowLeft className="h-5 w-5 shrink-0 text-amber-200" />
       ),
+      onClick: handleLogout,
     },
   ];
 
@@ -60,6 +80,7 @@ export function AppSidebar({ children }) {
                 <SidebarLink
                   key={idx}
                   link={link}
+                  onClick={link.onClick} //handle logout
                   className="hover:bg-gray-400   hover:text-slate-950 transition-colors"
                 />
               ))}
@@ -68,7 +89,7 @@ export function AppSidebar({ children }) {
           <div>
             <SidebarLink
               link={{
-                label: "User",
+                label: username || "User", //display username
                 href: "#",
                 icon: (
                   <img

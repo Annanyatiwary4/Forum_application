@@ -1,6 +1,6 @@
 "use client";
 import { AppSidebar } from "@/Components/AppSidebar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,17 +15,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
 
-const categories = [
-  { name: "General Discussion", postCount: 34 },
-  { name: "Announcements", postCount: 12 },
-  { name: "Help & Support", postCount: 22 },
-  { name: "Programming", postCount: 55 },
-  { name: "Tech News", postCount: 8 },
-  { name: "Off Topic", postCount: 14 },
-];
-
 const Dashboard = () => {
   const [query, setQuery] = useState("");
+  const [categories, setCategories] = useState([]);
 
   const handleChange = (e) => setQuery(e.target.value);
   const handleSubmit = (e) => {
@@ -33,13 +25,21 @@ const Dashboard = () => {
     console.log("Search submitted:", query);
   };
 
+  // Fetch categories from backend
+  useEffect(() => {
+    fetch("http://localhost:8081/api/categories")
+      .then((res) => res.json())
+      .then((data) => setCategories(data))
+      .catch((err) => console.error("Error fetching categories:", err));
+  }, []);
+
   return (
     <AppSidebar>
       <div className="flex flex-1 h-screen bg-slate-950 text-amber-200 flex-col">
         {/* Topbar */}
-        <div className="w-full flex items-center justify-center px-6 py-4 border-b border-amber-200/20 bg-slate-900 relative">
+        <div className="w-full flex flex-col md:flex-row items-center justify-between px-4 py-4 border-b border-amber-200/20 bg-slate-900">
           {/* Center - Search */}
-          <div className="flex-1 max-w-xl mx-auto">
+          <div className="flex-1 max-w-xl w-full mb-2 md:mb-0">
             <PlaceholdersAndVanishInput
               placeholders={[
                 "Search categories...",
@@ -52,10 +52,10 @@ const Dashboard = () => {
           </div>
 
           {/* Right - AlertDialog (Create Post) */}
-          <div className="absolute right-6">
+          <div>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button className="bg-amber-200 text-slate-950 hover:bg-amber-300">
+                <Button className="bg-amber-200 text-slate-950 hover:bg-amber-300 w-full md:w-auto">
                   Create New Post
                 </Button>
               </AlertDialogTrigger>
@@ -97,27 +97,25 @@ const Dashboard = () => {
         </div>
 
         {/* Content - Categories */}
-      <div className="flex-1 flex flex-col gap-4 rounded-tl-2xl border border-amber-200/20 bg-slate-900 p-6">
-  <ul className="space-y-4">
-    {categories.map((cat, idx) => (
-      <li
-        key={idx}
-        className="group flex flex-col justify-between cursor-pointer rounded-lg border border-amber-200/30 bg-slate-800 p-4 text-lg font-medium 
-                   transition-all duration-300 ease-in-out
-                   hover:bg-amber-200 hover:shadow-xl"
-      >
-        <span className="text-lg font-semibold text-amber-200 transition-colors duration-300 group-hover:text-slate-950">
-          {cat.name}
-        </span>
-        <span className="text-amber-200/70 text-sm mt-1 transition-colors duration-300 group-hover:text-slate-950">
-          {cat.postCount} posts
-        </span>
-      </li>
-    ))}
-  </ul>
-</div>
-
-
+        <div className="flex-1 flex flex-col gap-4 rounded-tl-2xl border border-amber-200/20 bg-slate-900 p-6 overflow-auto">
+          <ul className="space-y-4">
+            {categories.map((cat, idx) => (
+              <li
+                key={idx}
+                className="group flex flex-col justify-between cursor-pointer rounded-lg border border-amber-200/30 bg-slate-800 p-4 text-lg font-medium 
+                          transition-all duration-300 ease-in-out
+                          hover:bg-amber-200 hover:shadow-xl"
+              >
+                <span className="text-lg font-semibold text-amber-200 transition-colors duration-300 group-hover:text-slate-950">
+                  {cat.name}
+                </span>
+                <span className="text-amber-200/70 text-sm mt-1 transition-colors duration-300 group-hover:text-slate-950">
+                  {cat.postCount ?? cat.posts?.length ?? 0} posts
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </AppSidebar>
   );
