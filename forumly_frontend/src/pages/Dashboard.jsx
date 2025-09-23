@@ -21,7 +21,6 @@ const categories = [
   { name: "Help & Support", postCount: 22 },
   { name: "Programming", postCount: 55 },
   { name: "Tech News", postCount: 8 },
-  { name: "Off Topic", postCount: 14 },
 ];
 
 const Dashboard = () => {
