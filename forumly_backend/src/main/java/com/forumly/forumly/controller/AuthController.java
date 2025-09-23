@@ -1,6 +1,5 @@
 package com.forumly.forumly.controller;
 
-
 import com.forumly.forumly.entity.User;
 import com.forumly.forumly.repository.UserRepository;
 import com.forumly.forumly.util.JwtUtil;
@@ -26,19 +25,19 @@ public class AuthController {
 
     // Signup endpoint
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody User user) {
+    public ResponseEntity<Map<String, String>> signup(@RequestBody User user) {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body("Username already exists");
+            return ResponseEntity.badRequest().body(Map.of("message", "Username already exists"));
         }
 
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email already exists");
+            return ResponseEntity.badRequest().body(Map.of("message", "Email already exists"));
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
 
-        return ResponseEntity.ok("User registered successfully");
+        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
     }
 
     // Login endpoint
@@ -56,6 +55,6 @@ public class AuthController {
 
         String token = jwtUtil.generateToken(username);
 
-        return ResponseEntity.ok(Map.of("token", token));
+        return ResponseEntity.ok(Map.of("token", token, "message", "Login successful"));
     }
 }
