@@ -9,6 +9,7 @@ public class PostDTO {
     private Long id;
     private String title;
     private String content;
+    private String categoryName;
     private List<String> images;
     private List<String> links;
     private String author;

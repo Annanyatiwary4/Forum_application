@@ -35,6 +35,15 @@ public class PostController {
     // Create Post
     @PostMapping
     public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO dto, Authentication authentication) {
+
+        System.out.println("Authentication object: " + authentication);
+    if (authentication == null) {
+        System.out.println("No authentication found! SecurityContext: " +
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication());
+        throw new RuntimeException("User not authenticated");
+    }
+
+  
         String username = authentication.getName();
         User author = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));

@@ -11,6 +11,7 @@ import java.util.List;
 public interface PostMappers {
     @Mapping(target = "author", source = "author.username")
     @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "categoryName", source = "category.name")
     @Mapping(target = "comments", source = "comments")
     @Mapping(target = "upvotes", expression = "java((int) post.getVotes().stream().filter(v -> v.getType() == com.forumly.forumly.entity.Vote.VoteType.UPVOTE).count())")
     @Mapping(target = "downvotes", expression = "java((int) post.getVotes().stream().filter(v -> v.getType() == com.forumly.forumly.entity.Vote.VoteType.DOWNVOTE).count())")
