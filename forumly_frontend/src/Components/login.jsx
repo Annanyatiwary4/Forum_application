@@ -55,6 +55,7 @@ export default function Login() {
           console.log("Fetched user:", userData);
 
           localStorage.setItem("username", userData.username);
+     
       // Redirect to dashboard
       navigate("/dashboard");
     } catch (err) {
