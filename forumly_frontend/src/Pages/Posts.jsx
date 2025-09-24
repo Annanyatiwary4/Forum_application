@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams ,Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
@@ -14,9 +14,11 @@ const PostCard = ({ post }) => (
     <CardContent className="text-slate-300">
       {post.content || post.description}
       <div className="mt-2">
-        <Button variant="link" className="text-amber-200 p-0">
-          Read More
-        </Button>
+        <Link to={`/posts/${post.id}`}>
+          <Button variant="link" className="text-amber-200 p-0">
+            Read More
+          </Button>
+        </Link>
       </div>
     </CardContent>
     <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-slate-400 gap-2 sm:gap-0">
