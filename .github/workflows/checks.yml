@@ -17,14 +17,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # 2. Setup Node.js for frontend
+      # -------------------
+      # FRONTEND CHECKS
+      # -------------------
+
+      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: "npm"
 
-      # 3. Install frontend dependencies
+      # 3. Install Frontend Dependencies
       - name: Install Frontend Dependencies
         run: |
           cd forumly_frontend
@@ -36,19 +39,24 @@ jobs:
           cd forumly_frontend
           npm audit --audit-level=moderate
 
-      # 5. Frontend Env Check with clienvy
+      # 5. Frontend Env Check using clienvy
       - name: Frontend Env Check
         run: |
           cd forumly_frontend
           npx clienvy check
 
-      # 6. Optional: Backend checks
-      - name: Setup Java for Backend
+      # -------------------
+      # BACKEND CHECKS
+      # -------------------
+
+      # 6. Setup Java for Backend
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 20
 
+      # 7. Build Backend
       - name: Build Backend
         run: |
           cd forumly_backend
