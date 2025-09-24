@@ -1,4 +1,4 @@
-name: Global Security & Env Checks
+name: Frontend Security & Env Checks
 
 on:
   pull_request:
@@ -9,17 +9,13 @@ on:
       - main
 
 jobs:
-  global-checks:
+  frontend-checks:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repo
+      # 1. Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v3
-
-      # -------------------
-      # FRONTEND CHECKS
-      # -------------------
 
       # 2. Setup Node.js
       - name: Setup Node.js
@@ -27,37 +23,20 @@ jobs:
         with:
           node-version: 20
 
-      # 3. Install Frontend Dependencies
+      # 3. Install frontend dependencies
       - name: Install Frontend Dependencies
         run: |
           cd forumly_frontend
           npm ci
 
-      # 4. Frontend Security Check
+      # 4. Run frontend security check
       - name: Frontend Security Check
         run: |
           cd forumly_frontend
           npm audit --audit-level=moderate
 
-      # 5. Frontend Env Check using clienvy
+      # 5. Run frontend environment check using clienvy
       - name: Frontend Env Check
         run: |
           cd forumly_frontend
           npx clienvy check
-
-      # -------------------
-      # BACKEND CHECKS
-      # -------------------
-
-      # 6. Setup Java for Backend
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 20
-
-      # 7. Build Backend
-      - name: Build Backend
-        run: |
-          cd forumly_backend
-          ./mvnw clean verify
