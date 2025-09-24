@@ -41,9 +41,21 @@ export default function Login() {
 
       if (!res.ok) throw new Error(data.message || "Login failed");
 
-      // Save token if needed
-      localStorage.setItem("token", data.token);
+    // ✅ Save token from backend
+    localStorage.setItem("token", data.token);
+      // After storing token
+      const userRes = await fetch("http://localhost:8081/api/users/me", {
+        headers: {
+           Authorization: `Bearer ${data.token}`,
+        },
+      })
+        if (!userRes.ok) throw new Error("Failed to fetch user");
 
+          const userData = await userRes.json();
+          console.log("Fetched user:", userData);
+
+          localStorage.setItem("username", userData.username);
+     
       // Redirect to dashboard
       navigate("/dashboard");
     } catch (err) {
