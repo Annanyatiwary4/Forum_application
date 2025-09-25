@@ -34,6 +34,7 @@ public class SecurityConfig {
 public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.addAllowedOrigin("http://localhost:5173"); // your frontend URL
+    configuration.addAllowedOrigin("https://forumlyy.vercel.app");
     configuration.addAllowedHeader("*");
     configuration.addAllowedMethod("*");
     configuration.setAllowCredentials(true); // if you are using cookies/auth headers
