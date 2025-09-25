@@ -27,7 +27,7 @@ const Dashboard = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8081/api/categories");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/categories`);
       const data = await res.json();
       setCategories(data);
     } catch (err) {

@@ -42,8 +42,8 @@ const PostsPage = () => {
   // Fetch posts by category or all
   useEffect(() => {
     const url = categoryId
-      ? `http://localhost:8081/api/posts/category/${categoryId}`
-      : `http://localhost:8081/api/posts`;
+      ? `${import.meta.env.VITE_API_URL}/posts/category/${categoryId}`
+      : `${import.meta.env.VITE_API_URL}/posts`;
 
     fetch(url)
       .then((res) => res.json())

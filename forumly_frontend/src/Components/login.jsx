@@ -21,7 +21,7 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8081/api/auth/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export default function Login() {
     // ✅ Save token from backend
     localStorage.setItem("token", data.token);
       // After storing token
-      const userRes = await fetch("http://localhost:8081/api/users/me", {
+      const userRes = await fetch(`${import.meta.env.VITE_API_URL}/users/me`, {
         headers: {
            Authorization: `Bearer ${data.token}`,
         },

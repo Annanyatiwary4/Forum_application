@@ -16,7 +16,7 @@ const CreatePostDialog = ({ onPostCreated }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("http://localhost:8081/api/categories");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/categories`);
         const data = await res.json();
         setCategories(data);
       } catch (err) {
@@ -47,7 +47,7 @@ const CreatePostDialog = ({ onPostCreated }) => {
     };
 
     try {
-      const res = await fetch("http://localhost:8081/api/posts", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
