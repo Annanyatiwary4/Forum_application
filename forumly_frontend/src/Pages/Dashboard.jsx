@@ -1,11 +1,15 @@
 "use client";
-import { AppSidebar } from "@/Components/AppSidebar";
+
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
-import { Skeleton } from "@/components/ui/skeleton";
+
+
 import { useNavigate } from "react-router-dom";
+
+import { AppSidebar } from "@/Components/AppSidebar";
+import { PlaceholdersAndVanishInput } from "@/Components/ui/placeholders-and-vanish-input";
+import { Skeleton } from "@/Components/ui/skeleton";
 import CreatePostDialog from "@/Components/CreatePostDialog";
+
 
 const Dashboard = () => {
   const [query, setQuery] = useState("");

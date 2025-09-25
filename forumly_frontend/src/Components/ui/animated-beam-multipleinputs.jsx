@@ -2,8 +2,9 @@
 
 import React, { forwardRef, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { AnimatedBeam } from "./animated-beam";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Shadcn avatar
+
 
 const Circle = forwardRef(({ className, children }, ref) => {
   return (

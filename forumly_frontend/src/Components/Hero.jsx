@@ -2,8 +2,9 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { InteractiveHoverButton } from "./ui/interactive-hover-button";
+
 import { Link } from "react-router-dom";
+import { InteractiveHoverButton } from "./ui/interactive-hover-button";
 
 export default function HeroSection() {
   return (

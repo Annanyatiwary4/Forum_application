@@ -3,10 +3,10 @@ import { BellIcon, Share2Icon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Marquee } from "./ui/marquee";
-
+import { AnimatedListDemo } from "./ui/animatedlistdemo";
 import { AnimatedBeamMultipleOutputDemo } from "./ui/animated-beam-multipleinputs";
 import { BentoCard, BentoGrid } from "./ui/bento-grid";
-import { AnimatedListDemo } from "./ui/animatedlistdemo";
+
 
 
 const files = [

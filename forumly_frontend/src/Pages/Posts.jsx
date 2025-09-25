@@ -1,10 +1,11 @@
 import { useParams ,Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+
+import { Button } from "@/Components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@/Components/ui/card";
+import { ScrollArea } from "@/Components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 
 const PostCard = ({ post }) => (
   <Card className="bg-slate-950 border border-amber-200 mb-6 shadow-md hover:scale-105 transition-transform duration-200">

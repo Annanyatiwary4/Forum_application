@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+
+
 import { FaThumbsUp, FaThumbsDown, FaCommentAlt, FaShare } from "react-icons/fa";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/Components/ui/button";
+import { Textarea } from "@/Components/ui/textarea";
 
 // -------- Sample post data --------
 const samplePost = {

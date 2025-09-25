@@ -1,13 +1,13 @@
 // src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LandingPage from "./pages/LandingPage";
-
-import Signup from "./Components/Signup";
+import LandingPage from "./Pages/landingPage";
 import Login from "./Components/login";
-import Dashboard from "./pages/Dashboard";
+import Signup from "./Components/Signup";
+import Dashboard from "./Pages/Dashboard";
 import PostsPage from "./Pages/Posts";
-import  ViewPostPage from "./Pages/PostCard";
+import ViewPostPage from "./Pages/PostCard";
+
 
 
 

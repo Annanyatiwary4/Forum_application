@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { AnimatedList } from "./animated-list";
 
 
+
 let notifications = [
   {
     title: "New discussion started",

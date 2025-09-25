@@ -1,6 +1,5 @@
 import React from "react";
 import ScrollFloat from "./ScrollFloat";
-
 import { FeaturesCard } from "./FeaturesCard";
 
 export default function Features() {
