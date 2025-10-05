@@ -72,7 +72,7 @@ export function AppSidebar({ children }) {
         "border border-amber-200/40 bg-slate-950 text-amber-200"
       )}
     >
-      <Sidebar open={open} setOpn={setOpen} className="bg-slate-950">
+      <Sidebar open={open} setOpen={setOpen} className="bg-slate-950">
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
             {open ? <Logo /> : <LogoIcon />}

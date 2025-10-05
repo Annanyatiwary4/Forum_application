@@ -1,45 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
-
-
-import { FaThumbsUp, FaThumbsDown, FaCommentAlt, FaShare } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaThumbsUp, FaThumbsDown, FaCommentAlt, FaShare } from "react-icons/fa";
 import { Button } from "@/Components/ui/button";
 import { Textarea } from "@/Components/ui/textarea";
-
-// -------- Sample post data --------
-const samplePost = {
-  id: 1,
-  title: "How to learn React effectively?",
-  content: "I want to improve my React skills. Any tips for building projects and practicing?",
-  images: [
-    "https://via.placeholder.com/300x150",
-    "https://via.placeholder.com/200x200"
-  ],
-  links: ["https://reactjs.org/docs/getting-started.html"],
-  author: { username: "JohnDoe" },
-  category: { name: "React" },
-  createdAt: new Date(),
-  votes: [{ type: "UPVOTE" }, { type: "UPVOTE" }, { type: "DOWNVOTE" }],
-  userVote: null,
-  comments: [
-    {
-      id: 1,
-      author: "Jane",
-      content: "Start small and build projects!",
-      createdAt: new Date(),
-      replies: [
-        { id: 3, author: "JohnDoe", content: "Thanks, will do!", createdAt: new Date() }
-      ]
-    },
-    { id: 2, author: "Mike", content: "Follow the official docs first.", createdAt: new Date(), replies: [] }
-  ]
-};
-
-// -------- Utilities --------
-const countVotes = (votes = [], type) => votes.filter(v => v?.type === type).length;
 
 // -------- Comment Component --------
 const Comment = ({ comment }) => {
@@ -67,28 +34,15 @@ const Comment = ({ comment }) => {
 
       <div className="flex gap-2 mt-1">
         {replies.length > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-amber-200"
-            onClick={() => setShowReplies(prev => !prev)}
-          >
+          <Button variant="ghost" size="sm" className="text-amber-200" onClick={() => setShowReplies(!showReplies)}>
             {showReplies ? "Hide Replies" : `View Replies (${replies.length})`}
           </Button>
         )}
-
-        {/* Reply button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-amber-200"
-          onClick={() => setReplyOpen(prev => !prev)}
-        >
+        <Button variant="ghost" size="sm" className="text-amber-200" onClick={() => setReplyOpen(!replyOpen)}>
           {replyOpen ? "Cancel Reply" : "Reply"}
         </Button>
       </div>
 
-      {/* Reply input */}
       {replyOpen && (
         <div className="mt-2">
           <Textarea
@@ -98,46 +52,55 @@ const Comment = ({ comment }) => {
             className="bg-slate-800 text-amber-200 border border-amber-200"
             placeholder="Write a reply..."
           />
-          <Button
-            className="mt-1 bg-amber-200 text-slate-950 hover:bg-amber-300"
-            onClick={handleReplySubmit}
-          >
+          <Button className="mt-1 bg-amber-200 text-slate-950 hover:bg-amber-300" onClick={handleReplySubmit}>
             Submit
           </Button>
         </div>
       )}
 
-      {/* Replies list */}
       <AnimatePresence>
-        {showReplies && replies.map((r) => (
-          <motion.div
-            key={r.id}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="ml-4 mt-2 border-l border-slate-700 pl-3 text-slate-300 overflow-hidden"
-          >
-            <div className="flex justify-between text-slate-400 text-sm">
-              <span>{r.author || "Anonymous"}</span>
-              <span>{format(new Date(r.createdAt), "MMM dd, yyyy")}</span>
-            </div>
-            <p className="mt-1">{r.content}</p>
-          </motion.div>
-        ))}
+        {showReplies &&
+          replies.map((r) => (
+            <motion.div
+              key={r.id}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="ml-4 mt-2 border-l border-slate-700 pl-3 text-slate-300 overflow-hidden"
+            >
+              <div className="flex justify-between text-slate-400 text-sm">
+                <span>{r.author || "Anonymous"}</span>
+                <span>{format(new Date(r.createdAt), "MMM dd, yyyy")}</span>
+              </div>
+              <p className="mt-1">{r.content}</p>
+            </motion.div>
+          ))}
       </AnimatePresence>
     </div>
   );
 };
 
-// -------- Post Card Component --------
+// -------- PostCard Component --------
 const PostCard = ({ post }) => {
-  const [voteState, setVoteState] = useState(post.userVote || null);
-  const [upvotes, setUpvotes] = useState(countVotes(post.votes, "UPVOTE"));
-  const [downvotes, setDownvotes] = useState(countVotes(post.votes, "DOWNVOTE"));
-
+  const [voteState, setVoteState] = useState(null);
+  const [upvotes, setUpvotes] = useState(post.upvotes || 0);
+  const [downvotes, setDownvotes] = useState(post.downvotes || 0);
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState(post.comments);
+  const [comments, setComments] = useState(
+    (post.comments || []).map((c) => ({
+      ...c,
+      content: (() => {
+        try {
+          const parsed = JSON.parse(c.content);
+          return parsed.content || c.content;
+        } catch {
+          return c.content;
+        }
+      })(),
+      replies: c.replies || [],
+    }))
+  );
   const [newComment, setNewComment] = useState("");
 
   const handleVote = (type) => {
@@ -147,7 +110,6 @@ const PostCard = ({ post }) => {
     } else {
       if (voteState === "UPVOTE") setUpvotes(upvotes - 1);
       if (voteState === "DOWNVOTE") setDownvotes(downvotes - 1);
-
       setVoteState(type);
       type === "UPVOTE" ? setUpvotes(upvotes + 1) : setDownvotes(downvotes + 1);
     }
@@ -190,7 +152,11 @@ const PostCard = ({ post }) => {
       {post.links?.length > 0 && (
         <ul className="mb-3 text-amber-300">
           {post.links.map((link, idx) => (
-            <li key={idx}><a href={link} target="_blank" rel="noopener noreferrer" className="underline">{link}</a></li>
+            <li key={idx}>
+              <a href={link} target="_blank" rel="noopener noreferrer" className="underline">
+                {link}
+              </a>
+            </li>
           ))}
         </ul>
       )}
@@ -213,7 +179,7 @@ const PostCard = ({ post }) => {
         >
           <FaThumbsDown /> {downvotes}
         </Button>
-        <Button variant="ghost" className="text-amber-200" size="sm" onClick={() => setShowComments(prev => !prev)}>
+        <Button variant="ghost" className="text-amber-200" size="sm" onClick={() => setShowComments(!showComments)}>
           <FaCommentAlt /> {comments.length}
         </Button>
         <Button variant="ghost" className="text-amber-200" size="sm">
@@ -245,8 +211,10 @@ const PostCard = ({ post }) => {
               </Button>
             </div>
 
-            {/* Comment list */}
-            {comments.map(c => (<Comment key={c.id} comment={c} />))}
+            {/* Comment List */}
+            {comments.length > 0 ? comments.map((c) => <Comment key={c.id} comment={c} />) : (
+              <p className="text-slate-400 text-sm">No comments yet.</p>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -256,9 +224,42 @@ const PostCard = ({ post }) => {
 
 // -------- ViewPostPage --------
 const ViewPostPage = () => {
+  const [post, setPost] = useState(null);
+  const { postId } = useParams();
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${postId}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const data = await res.json();
+
+        // Map backend response to frontend structure
+        const mappedPost = {
+          ...data,
+          author: { username: data.author },
+          category: { name: data.categoryName },
+        };
+
+        setPost(mappedPost);
+      } catch (err) {
+        console.error("Failed to fetch post:", err);
+      }
+    };
+    if (postId) fetchPost();
+  }, [postId]);
+
+  if (!post) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center bg-slate-950 text-amber-200">
+        Loading post...
+      </div>
+    );
+  }
+
   return (
     <div className="w-full min-h-screen bg-slate-950 p-4">
-      <PostCard post={samplePost} />
+      <PostCard post={post} />
     </div>
   );
 };
