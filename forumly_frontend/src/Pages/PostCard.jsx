@@ -148,7 +148,7 @@ const Comment = ({ comment, postId, refreshComments }) => {
 
 // -------- PostCard Component --------
 const PostCard = ({ post }) => {
-  const [voteState, setVoteState] = useState(null);
+  const [voteState, setVoteState] = useState(post.userVote || null); // <--- Track user's vote
   const [upvotes, setUpvotes] = useState(post.upvotes || 0);
   const [downvotes, setDownvotes] = useState(post.downvotes || 0);
   const [showComments, setShowComments] = useState(false);
@@ -172,17 +172,76 @@ const PostCard = ({ post }) => {
 }, [post?.id]);
 
 
-  const handleVote = (type) => {
-    if (voteState === type) {
-      setVoteState(null);
-      type === "UPVOTE" ? setUpvotes(upvotes - 1) : setDownvotes(downvotes - 1);
-    } else {
-      if (voteState === "UPVOTE") setUpvotes(upvotes - 1);
-      if (voteState === "DOWNVOTE") setDownvotes(downvotes - 1);
-      setVoteState(type);
-      type === "UPVOTE" ? setUpvotes(upvotes + 1) : setDownvotes(downvotes + 1);
+ const [voteLoading, setVoteLoading] = useState(false);
+
+// Refresh post votes (to stay in sync after change)
+const refreshVotes = async () => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${post.id}`);
+    if (res.ok) {
+      const data = await res.json();
+      setUpvotes(data.upvotes);
+      setDownvotes(data.downvotes);
+      setVoteState(data.userVote || null);
     }
-  };
+  } catch (err) {
+    console.error("Failed to refresh votes:", err);
+  }
+};
+
+const handleVote = async (type) => {
+  if (voteLoading) return;
+  setVoteLoading(true);
+
+  const previousVote = voteState;
+  const prevUpvotes = upvotes;
+  const prevDownvotes = downvotes;
+
+  let newUpvotes = upvotes;
+  let newDownvotes = downvotes;
+
+  // Double-click = remove vote
+  if (voteState === type) {
+    setVoteState(null);
+    type === "UPVOTE" ? newUpvotes-- : newDownvotes--;
+  } else {
+    // Switching vote
+    if (voteState === "UPVOTE") newUpvotes--;
+    if (voteState === "DOWNVOTE") newDownvotes--;
+    type === "UPVOTE" ? newUpvotes++ : newDownvotes++;
+    setVoteState(type);
+  }
+
+  // Optimistic UI update
+  setUpvotes(newUpvotes);
+  setDownvotes(newDownvotes);
+
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/votes?postId=${post.id}&type=${type}`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      }
+    );
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Vote failed: ${text}`);
+    }
+
+    await refreshVotes(); // ✅ Re-sync from backend immediately
+  } catch (err) {
+    console.error(err);
+    // Rollback UI if failed
+    setVoteState(previousVote);
+    setUpvotes(prevUpvotes);
+    setDownvotes(prevDownvotes);
+  } finally {
+    setVoteLoading(false);
+  }
+};
+
 
  const handleAddComment = async () => {
     if (!newComment.trim()) return;
@@ -252,29 +311,46 @@ const PostCard = ({ post }) => {
 
       {/* Actions */}
       <div className="flex items-center gap-4 border-t border-slate-700 pt-3">
-        <Button
-          variant={voteState === "UPVOTE" ? "secondary" : "ghost"}
-          className="text-amber-200 border-amber-200"
-          size="sm"
-          onClick={() => handleVote("UPVOTE")}
-        >
-          <FaThumbsUp /> {upvotes}
-        </Button>
-        <Button
-          variant={voteState === "DOWNVOTE" ? "secondary" : "ghost"}
-          className="text-amber-200 border-amber-200"
-          size="sm"
-          onClick={() => handleVote("DOWNVOTE")}
-        >
-          <FaThumbsDown /> {downvotes}
-        </Button>
-        <Button variant="ghost" className="text-amber-200" size="sm" onClick={() => setShowComments(!showComments)}>
-          <FaCommentAlt /> {comments.length}
-        </Button>
-        <Button variant="ghost" className="text-amber-200" size="sm">
-          <FaShare /> Share
-        </Button>
-      </div>
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={() => handleVote("UPVOTE")}
+    className={`flex items-center gap-2 ${
+      voteState === "UPVOTE"
+        ? "text-blue-400 border-blue-400"
+        : "text-amber-200 border-amber-200"
+    }`}
+  >
+    <FaThumbsUp /> {upvotes || 0}
+  </Button>
+
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={() => handleVote("DOWNVOTE")}
+    className={`flex items-center gap-2 ${
+      voteState === "DOWNVOTE"
+        ? "text-blue-400 border-blue-400"
+        : "text-amber-200 border-amber-200"
+    }`}
+  >
+    <FaThumbsDown /> {downvotes || 0}
+  </Button>
+
+  <Button
+    variant="ghost"
+    size="sm"
+    className="text-amber-200"
+    onClick={() => setShowComments(!showComments)}
+  >
+    <FaCommentAlt /> {comments.length || 0}
+  </Button>
+
+  <Button variant="ghost" size="sm" className="text-amber-200">
+    <FaShare /> Share
+  </Button>
+</div>
+
 
       {/* Comments */}
       <AnimatePresence>
@@ -329,6 +405,7 @@ const ViewPostPage = () => {
           ...data,
           author: { username: data.author },
           category: { name: data.categoryName },
+          userVote: data.userVote || null, 
         };
 
         setPost(mappedPost);
