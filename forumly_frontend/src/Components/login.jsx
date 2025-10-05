@@ -8,51 +8,67 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
 
+
+
 export default function Login() {
-  const [username, setUsername] = useState(""); 
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [warning, setWarning] = useState(""); // <-- simple warning message
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setWarning(""); // reset warning
+
+    if (!username || !password) {
+      setWarning("Please fill in both fields.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ username, password }), // <-- send username
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message || "Login failed");
+      if (!res.ok) {
+        const message = data.message?.toLowerCase() || "";
+        if (message.includes("user not found")) {
+          setWarning("User not found. Please sign up first.");
+        } else if (message.includes("invalid credentials")) {
+          setWarning("Invalid username or password.");
+        } else {
+          setWarning(data.message || "Login failed. Try again.");
+        }
+        setLoading(false);
+        return;
+      }
 
-    // ✅ Save token from backend
-    localStorage.setItem("token", data.token);
-      // After storing token
+      localStorage.setItem("token", data.token);
+
       const userRes = await fetch(`${import.meta.env.VITE_API_URL}/users/me`, {
-        headers: {
-           Authorization: `Bearer ${data.token}`,
-        },
-      })
-        if (!userRes.ok) throw new Error("Failed to fetch user");
+        headers: { Authorization: `Bearer ${data.token}` },
+      });
 
-          const userData = await userRes.json();
-          console.log("Fetched user:", userData);
+      if (!userRes.ok) {
+        setWarning("Failed to fetch user.");
+        setLoading(false);
+        return;
+      }
 
-          localStorage.setItem("username", userData.username);
-     
-      // Redirect to dashboard
+      const userData = await userRes.json();
+      localStorage.setItem("username", userData.username);
+
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message);
+      setWarning("Server unreachable. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -64,18 +80,18 @@ export default function Login() {
         <CardHeader>
           <CardTitle className="text-amber-200">Login to your account</CardTitle>
           <CardDescription className="text-gray-300">
-            Enter your username below to login
+            Enter your username and password to continue
           </CardDescription>
-          <CardAction>
-            <Button asChild variant="link" className="text-amber-200 hover:text-amber-300">
-              <Link to="/signup">Sign Up</Link>
-            </Button>
-          </CardAction>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            {/* Username */}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {warning && (
+              <div className="text-yellow-400 text-sm font-medium">
+                {warning}
+              </div>
+            )}
+
             <div className="grid gap-2">
               <Label htmlFor="username" className="text-amber-200">Username</Label>
               <Input
@@ -89,14 +105,10 @@ export default function Login() {
               />
             </div>
 
-            {/* Password */}
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password" className="text-amber-200">Password</Label>
-                <a
-                  href="#"
-                  className="ml-auto inline-block text-sm text-amber-200 hover:text-amber-300 underline-offset-4 hover:underline"
-                >
+                <a href="#" className="ml-auto text-sm text-amber-200 hover:text-amber-300 underline-offset-4 hover:underline">
                   Forgot your password?
                 </a>
               </div>
@@ -109,8 +121,6 @@ export default function Login() {
                 className="bg-slate-950 text-white border-amber-200 focus:border-amber-300"
               />
             </div>
-
-            {error && <p className="text-red-500 text-sm">{error}</p>}
 
             <Button
               type="submit"
