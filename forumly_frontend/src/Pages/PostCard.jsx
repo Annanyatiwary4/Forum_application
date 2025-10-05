@@ -4,31 +4,73 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaThumbsUp, FaThumbsDown, FaCommentAlt, FaShare } from "react-icons/fa";
+import { FaThumbsUp, FaThumbsDown, FaCommentAlt, FaShare, FaTrash } from "react-icons/fa";
 import { Button } from "@/Components/ui/button";
 import { Textarea } from "@/Components/ui/textarea";
 
 // -------- Comment Component --------
-const Comment = ({ comment }) => {
+const Comment = ({ comment, postId, refreshComments }) => {
   const [showReplies, setShowReplies] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [replies, setReplies] = useState(comment.replies || []);
+  const currentUser = localStorage.getItem("username");
 
-  const handleReplySubmit = () => {
+  // Add reply
+  const handleReplySubmit = async () => {
     if (!replyContent.trim()) return;
-    const newReply = { id: Date.now(), author: "You", content: replyContent, createdAt: new Date() };
-    setReplies([...replies, newReply]);
-    setReplyContent("");
-    setReplyOpen(false);
-    setShowReplies(true);
+
+    const payload = {
+      content: replyContent,
+      postId,
+      parentCommentId: comment.id,
+    };
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" ,"Authorization": `Bearer ${localStorage.getItem("token")}`},
+        body: JSON.stringify(payload),
+        
+      });
+      if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Failed to add reply: ${text}`);
+    }
+      const newReply = await res.json();
+      setReplies([...replies, newReply]);
+      setReplyContent("");
+      setReplyOpen(false);
+      setShowReplies(true);
+      refreshComments();
+    } catch (err) {
+      console.error("Failed to add reply:", err);
+    }
   };
+
+  // Delete comment
+  const handleDelete = async (id) => {
+    try {
+      const res= await fetch(`${import.meta.env.VITE_API_URL}/comments/${id}`, {
+        method: "DELETE",
+       headers:{ "Authorization": `Bearer ${localStorage.getItem("token")}`}
+      });
+      if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Failed to delete comment: ${text}`);
+    }
+      refreshComments();
+    } catch (err) {
+      console.error("Failed to delete comment:", err);
+    }
+  };
+
 
   return (
     <div className="ml-4 mt-3 border-l border-slate-700 pl-3">
       <div className="flex justify-between text-slate-400 text-sm">
         <span>{comment.author || "Anonymous"}</span>
-        <span>{format(new Date(comment.createdAt), "MMM dd, yyyy")}</span>
+       <span>{comment.createdAt ? format(new Date(comment.createdAt), "MMM dd, yyyy") : "..."}</span>
       </div>
       <p className="text-slate-300 mt-1">{comment.content}</p>
 
@@ -41,6 +83,16 @@ const Comment = ({ comment }) => {
         <Button variant="ghost" size="sm" className="text-amber-200" onClick={() => setReplyOpen(!replyOpen)}>
           {replyOpen ? "Cancel Reply" : "Reply"}
         </Button>
+        
+          {comment.author === currentUser && (
+          <Button 
+            variant="ghost" size="sm" className="text-red-400" 
+            onClick={() => handleDelete(comment.id)}
+          >
+            <FaTrash /> Delete
+          </Button>
+        )}
+
       </div>
 
       {replyOpen && (
@@ -69,14 +121,27 @@ const Comment = ({ comment }) => {
               transition={{ duration: 0.3 }}
               className="ml-4 mt-2 border-l border-slate-700 pl-3 text-slate-300 overflow-hidden"
             >
-              <div className="flex justify-between text-slate-400 text-sm">
-                <span>{r.author || "Anonymous"}</span>
-                <span>{format(new Date(r.createdAt), "MMM dd, yyyy")}</span>
+              <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center text-slate-400 text-sm gap-1 sm:gap-0">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <span>{r.author || "Anonymous"}</span>
+                  <span>{r.createdAt ? format(new Date(r.createdAt), "MMM dd, yyyy") : "..."}</span>
+                </div>
+                {r.author === currentUser && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-400 mt-1 sm:mt-0"
+                    onClick={() => handleDelete(r.id)}
+                  >
+                    <FaTrash /> Delete
+                  </Button>
+                )}
               </div>
               <p className="mt-1">{r.content}</p>
             </motion.div>
           ))}
       </AnimatePresence>
+
     </div>
   );
 };
@@ -87,21 +152,25 @@ const PostCard = ({ post }) => {
   const [upvotes, setUpvotes] = useState(post.upvotes || 0);
   const [downvotes, setDownvotes] = useState(post.downvotes || 0);
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState(
-    (post.comments || []).map((c) => ({
-      ...c,
-      content: (() => {
-        try {
-          const parsed = JSON.parse(c.content);
-          return parsed.content || c.content;
-        } catch {
-          return c.content;
-        }
-      })(),
-      replies: c.replies || [],
-    }))
-  );
+  
+  const [comments, setComments] = useState([]);
+
   const [newComment, setNewComment] = useState("");
+
+  const fetchComments = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/comments/post/${post.id}`);
+      const data = await res.json();
+      setComments(data);
+    } catch (err) {
+      console.error("Failed to fetch comments:", err);
+    }
+  };
+
+  useEffect(() => {
+  if (post?.id) fetchComments();
+}, [post?.id]);
+
 
   const handleVote = (type) => {
     if (voteState === type) {
@@ -115,12 +184,32 @@ const PostCard = ({ post }) => {
     }
   };
 
-  const handleAddComment = () => {
+ const handleAddComment = async () => {
     if (!newComment.trim()) return;
-    const newC = { id: Date.now(), author: "You", content: newComment, createdAt: new Date(), replies: [] };
-    setComments([newC, ...comments]);
-    setNewComment("");
-    setShowComments(true);
+    const payload = { content: newComment, postId: post.id, parentCommentId: null };
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+         },
+        body: JSON.stringify(payload),
+       
+      });
+        if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Failed to add comment: ${text}`);
+    }
+
+
+      const savedComment = await res.json();
+      setComments([savedComment, ...comments]);
+      setNewComment("");
+      setShowComments(true);
+    } catch (err) {
+      console.error("Failed to add comment:", err);
+    }
   };
 
   return (
@@ -212,7 +301,8 @@ const PostCard = ({ post }) => {
             </div>
 
             {/* Comment List */}
-            {comments.length > 0 ? comments.map((c) => <Comment key={c.id} comment={c} />) : (
+            {comments.length > 0 ? comments.map((c) => <Comment key={c.id} comment={c} postId={post.id} 
+            refreshComments={fetchComments}  />) : (
               <p className="text-slate-400 text-sm">No comments yet.</p>
             )}
           </motion.div>
