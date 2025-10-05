@@ -1,6 +1,7 @@
 // src/pages/LandingPage.jsx
 
 import Features from "@/Components/Features";
+import Footer from "@/Components/footer";
 import HeroSection from "@/Components/Hero";
 import Navbar from "@/Components/Navbar";
 import Menu from "@/Components/ui/quotes";
@@ -36,6 +37,10 @@ const LandingPage = () => {
       </main>
 
       {/* Footer */}
+      <section id="footer" className="  w-full  px-5 md:px-10 bg-card-foreground text-foreground dark:bg-background dark:text-primary-foreground">
+         
+         <Footer />
+        </section>
       
     </div>
   );
