@@ -7,7 +7,7 @@ export default function Features() {
     <>
       {/* ===== What's Inside Section ===== */}
           <section className="text-white px-6 md:px-12">
-            <div className="mx-auto text-[8rem] font-mono">
+            <div className="mx-auto bg-foreground dark:bg-background text-[8rem] font-mono">
             <ScrollFloat
       animationDuration={1}
       ease="back.inOut(2)"
@@ -20,7 +20,7 @@ export default function Features() {
         <div className="mt-5">
             {/* Import and render your feature cards here */}
             
-                    <FeaturesCard />
+            <FeaturesCard />
 
           </div>
 

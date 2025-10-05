@@ -43,26 +43,43 @@ const features = [
     background: (
       <Marquee
         pauseOnHover
-        className="absolute top-10 [--duration:20s] [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)] "
+        // Use from-background for the mask gradient to match the theme
+        className="absolute top-10 [--duration:20s] [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)]"
       >
         {files.map((f, idx) => (
           <figure
             key={idx}
             className={cn(
               "relative w-32 cursor-pointer overflow-hidden rounded-xl border p-4",
-              "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-              "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
-              "transform-gpu blur-[1px] transition-all duration-300 ease-out hover:blur-none",
+              
+              // LIGHT MODE:
+              // border-gray-950/[.1] -> border-border
+              // bg-gray-950/[.01] -> bg-background/50 (subtle contrast)
+              // hover:bg-gray-950/[.05] -> hover:bg-secondary
+              "border-border bg-background/50 hover:bg-secondary",
+              
+              // DARK MODE:
+              // dark:border-gray-50/[.1] -> dark:border-border
+              // dark:bg-gray-50/[.10] -> dark:bg-card (slightly elevated from dark background)
+              // dark:hover:bg-gray-50/[.15] -> dark:hover:bg-accent/10 (subtle highlight)
+              "dark:border-border dark:bg-card dark:hover:bg-accent/10",
+              
+              // Text Color forfigcaption (name)
+              "text-foreground",
+
+              "transform-gpu opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-300 ease-out"
             )}
           >
             <div className="flex flex-row items-center gap-2">
               <div className="flex flex-col">
-                <figcaption className="text-sm font-medium dark:text-white ">
+                {/* Figcaption: text-foreground (name) */}
+                <figcaption className="text-sm font-medium text-foreground">
                   {f.name}
                 </figcaption>
               </div>
             </div>
-            <blockquote className="mt-2 text-xs">{f.body}</blockquote>
+            {/* Blockquote: text-muted-foreground (body) */}
+            <blockquote className="mt-2 text-xs text-muted-foreground">{f.body}</blockquote>
           </figure>
         ))}
       </Marquee>
@@ -90,7 +107,7 @@ const features = [
       <AnimatedBeamMultipleOutputDemo className="absolute right-2 top-4 h-[300px] border-none transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-105" />
     ),
   },
-   {
+  {
     Icon: FileTextIcon,
     name: "Get Help from fellow Developers",
     description: "Need help? Post your problem and get a solution fast from the community.",
@@ -101,18 +118,33 @@ const features = [
       <figure
         className={cn(
           "relative w-full cursor-pointer overflow-hidden rounded-xl border p-4",
-          "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-          "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
-          "transform-gpu blur-[1px] transition-all duration-300 ease-out hover:blur-none",
+          
+          // LIGHT MODE:
+          // border-gray-950/[.1] -> border-border
+          // bg-gray-950/[.01] -> bg-background/50
+          // hover:bg-gray-950/[.05] -> hover:bg-secondary
+          "border-border bg-background/50 hover:bg-secondary",
+
+          // DARK MODE:
+          // dark:border-gray-50/[.1] -> dark:border-border
+          // dark:bg-gray-50/[.10] -> dark:bg-card
+          // dark:hover:bg-gray-50/[.15] -> dark:hover:bg-accent/10
+          "dark:border-border dark:bg-card dark:hover:bg-accent/10",
+          
+          // Blockquote text color:
+          "text-muted-foreground",
+
+          // ✅ Crisp effect: no blur, subtle fade and scale on hover
+          "transform-gpu opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-300 ease-out"
         )}
       >
         <blockquote className="mt-2 text-xs">
           {`
-           Hey everyone! I'm struggling with a CSS layout issue...
-          I've tried using flexbox but the items aren't aligning correctly.
-          Can someone take a look at my code?
-           [code link here]
-          `}
+              Hey everyone! I'm struggling with a CSS layout issue...
+            I've tried using flexbox but the items aren't aligning correctly.
+            Can someone take a look at my code?
+              [code link here]
+            `}
         </blockquote>
       </figure>
     ),

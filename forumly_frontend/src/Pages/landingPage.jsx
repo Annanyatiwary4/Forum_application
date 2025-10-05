@@ -22,13 +22,14 @@ const LandingPage = () => {
         <section id="hero">
          <HeroSection />
         </section>
+        
 
         {/* Features Section */}
-        <section id="features" className=" min-h-screen w-full py-20 px-5 md:px-10 lg:px-20 bg-slate-900">
+        <section id="features" className=" min-h-screen w-full px-5 bg-foreground dark:bg-background md:px-10 lg:px-20 ">
          <Features />
         
         </section>
-        <section id="menu" className=" min-h-screen w-full py-20 px-5 md:px-10  bg-slate-950">
+        <section id="menu" className=" min-h-screen w-full py-20 px-5 md:px-10 bg-card-foreground text-foreground dark:bg-background dark:text-primary-foreground">
          
          <Menu />
         </section>

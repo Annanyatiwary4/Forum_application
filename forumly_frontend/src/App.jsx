@@ -7,6 +7,7 @@ import Signup from "./Components/Signup";
 import Dashboard from "./Pages/Dashboard";
 import PostsPage from "./Pages/Posts";
 import ViewPostPage from "./Pages/PostCard";
+import ProfilePage from "./Pages/ProfilePage";
 
 
 
@@ -22,6 +23,7 @@ const App = () => {
          <Route path="/dashboard" element={<Dashboard />} />
          <Route path="/posts/category/:categoryId" element={<PostsPage />} />
          <Route path="/posts/:postId" element ={<ViewPostPage />} />
+         <Route path="/profile" element ={<ProfilePage/>} />
       </Routes>
     </Router>
   );

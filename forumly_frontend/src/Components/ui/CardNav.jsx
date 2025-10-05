@@ -12,7 +12,8 @@ const CardNav = ({
   baseColor = '#fff',
   menuColor,
   buttonBgColor,
-  buttonTextColor
+  buttonTextColor,
+  customButton
 }) => {
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -170,13 +171,15 @@ const CardNav = ({
             )}
           </div>
 
-
+         {customButton ? (
+          customButton // 👈 Render custom button if provided
+        ) : (
           <button
             type="button"
             className="card-nav-cta-button hidden md:inline-flex border-0 rounded-[calc(0.75rem-0.2rem)] px-4 h-full font-medium cursor-pointer transition-colors duration-300"
             style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}>
             Get Started
-          </button>
+          </button>)}
         </div>
 
         <div

@@ -1,6 +1,7 @@
 // src/components/Navbar.jsx
 import React from "react";
 import CardNav from "./ui/CardNav";
+import { DarkModeToggle } from "./ui/Darkmode";
 
 
 
@@ -46,6 +47,7 @@ const Navbar = () => {
       buttonBgColor="#111"
       buttonTextColor="#fff"
       ease="power3.out"
+      customButton={<DarkModeToggle/>}
     />
   );
 };

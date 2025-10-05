@@ -41,7 +41,7 @@ export function AppSidebar({ children }) {
     },
     {
       label: "Profile",
-      href: "#",
+      href: "/profile",
       icon: (
         <IconUserBolt className="h-5 w-5 shrink-0 text-amber-200" />
       ),

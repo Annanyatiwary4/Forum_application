@@ -58,28 +58,32 @@ function MenuItem({ link, text, description }) {
     // Stop marquee
     gsap.killTweensOf(marqueeRef.current);
   };
-
-const repeatedMarqueeContent = Array.from({ length: 4 }).map((_, idx) => (
-  <span
-    key={idx}
-    className="text-4xl font-semibold text-gray-700 whitespace-nowrap mr-8"
-  >
-    {description}
-  </span>
-));
+    const repeatedMarqueeContent = Array.from({ length: 4 }).map((_, idx) => (
+    <span
+      key={idx}
+      // Marquee Text: text-gray-700 -> text-muted-foreground (used for secondary/subtle text)
+      className="text-4xl font-semibold text-muted-foreground whitespace-nowrap mr-8"
+    >
+      {description}
+    </span>
+  ));
 
 
   return (
     <div
-      className="relative h-[100px] bg-slate-950 border-2 w-full rounded-r-md border-b-gray-800 overflow-hidden"
+      // Item Container:
+      // bg-slate-950 -> bg-card (neutral background, off-black in dark mode)
+      // border-b-gray-800 -> border-border
+      className="relative h-[100px] bg-card-foreground dark:bg-background border-2 w-full rounded-r-md border-b-border overflow-hidden"
       ref={itemRef}
       onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseLeave={handleMouseLeave} 
     >
       <a
         href={link}
         ref={headingRef}
-        className="flex items-center justify-center h-full uppercase font-bold text-white text-[2rem] cursor-pointer z-10 relative"
+        // Heading Text: text-white -> text-foreground (White in dark mode, black in light mode)
+        className="flex items-center justify-center h-full uppercase font-bold text-background dark:text-foreground text-[2rem] cursor-pointer z-10 relative"
       >
         {text}
       </a>
@@ -87,7 +91,10 @@ const repeatedMarqueeContent = Array.from({ length: 4 }).map((_, idx) => (
       {/* Floating marquee inside container */}
       <div
         ref={overlayRef}
-        className="absolute top-0 left-0 w-full h-full bg-white/90 flex items-center overflow-hidden opacity-0"
+        // Overlay Background:
+        // bg-white/90 -> bg-primary/90 (Using the Amber primary color for the hover overlay)
+        // flex items-center overflow-hidden opacity-0
+        className="absolute top-0 left-0 w-full h-full bg-primary/90 flex items-center overflow-hidden opacity-0"
       >
         <div
           ref={marqueeRef}
