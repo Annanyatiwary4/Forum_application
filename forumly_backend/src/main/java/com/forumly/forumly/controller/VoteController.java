@@ -45,6 +45,12 @@ public class VoteController {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
         Vote vote = voteService.vote(post, user, type);
-        return ResponseEntity.ok(voteMapper.toDTO(vote));
+
+                        if (vote == null) {
+                        return ResponseEntity.ok(null);  // vote removed
+                        }
+
+return ResponseEntity.ok(voteMapper.toDTO(vote));
+
     }
 }

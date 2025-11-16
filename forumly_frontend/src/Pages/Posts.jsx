@@ -8,7 +8,7 @@ import { ScrollArea } from "@/Components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 
 const PostCard = ({ post }) => (
-  <Card className="bg-slate-950 border border-amber-200 mb-6 shadow-md hover:scale-105 transition-transform duration-200">
+  <Card className="bg-slate-950 border border-amber-200 mb-6 shadow-md cursor-pointer hover:shadow-xl transition-shadow">
     <CardHeader className="pb-2">
       <h2 className="text-2xl font-bold text-amber-200">{post.title}</h2>
     </CardHeader>
@@ -16,7 +16,7 @@ const PostCard = ({ post }) => (
       {post.content || post.description}
       <div className="mt-2">
         <Link to={`/posts/${post.id}`}>
-          <Button variant="link" className="text-amber-200 p-0">
+          <Button variant="link" className="text-amber-200 p-0 cursor-pointer">
             Read More
           </Button>
         </Link>

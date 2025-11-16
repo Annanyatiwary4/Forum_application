@@ -20,7 +20,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/users/me", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/users/me`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -44,34 +44,47 @@ export default function ProfilePage() {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+ const handleUpdate = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      const res = await fetch(`/api/users/${user.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(user),
-      });
+  try {
+    // Clone user object
+    const updatedUser = { ...user };
 
-      if (!res.ok) throw new Error("Failed to update profile");
+    // 🧹 Remove any empty fields before sending to backend
+    Object.keys(updatedUser).forEach((key) => {
+      if (updatedUser[key] === "" || updatedUser[key] === null) {
+        delete updatedUser[key];
+      }
+    });
 
-      const updated = await res.json();
-      setUser(updated);
-      setIsError(false);
-      setMessage("Profile updated successfully 🎉");
-    } catch (err) {
-      setIsError(true);
-      setMessage(err.message);
-    } finally {
-      setOpen(true);
-      setLoading(false);
-    }
-  };
+    console.log("Sending to backend:", updatedUser); // 🪶 debug log
+
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/users/${user.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(updatedUser),
+    });
+
+    if (!res.ok) throw new Error("Failed to update profile");
+
+    const updated = await res.json();
+    setUser(updated);
+    setIsError(false);
+    setMessage("Profile updated successfully 🎉");
+  } catch (err) {
+    setIsError(true);
+    setMessage(err.message);
+  } finally {
+    setOpen(true);
+    setLoading(false);
+  }
+};
+
 
   if (!user) return <div className="text-center text-amber-600 mt-10">Loading profile...</div>;
 

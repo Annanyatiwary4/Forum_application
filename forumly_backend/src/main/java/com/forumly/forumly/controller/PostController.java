@@ -7,6 +7,7 @@ import com.forumly.forumly.entity.Post;
 import com.forumly.forumly.entity.User;
 import com.forumly.forumly.repository.CategoryRepository;
 import com.forumly.forumly.repository.UserRepository;
+import com.forumly.forumly.repository.PostRepository;
 import com.forumly.forumly.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,9 @@ public class PostController {
 
     @Autowired
     private PostMappers postMapper;
+
+    @Autowired
+    private PostRepository PostRepository;
 
     // Create Post
     @PostMapping
@@ -65,10 +69,16 @@ public class PostController {
 
     // Get Post by ID
     @GetMapping("/{id}")
-    public ResponseEntity<PostDTO> getPost(@PathVariable Long id) {
-        Post post = postService.getPostById(id); // service handles nested replies
-        return ResponseEntity.ok(postMapper.toDTO(post)); // use mapper
-    }
+public ResponseEntity<PostDTO> getPost(@PathVariable Long id, Authentication authentication) {
+    Post post = PostRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Post not found"));
+
+    String currentUser = authentication != null ? authentication.getName() : null;
+
+    PostDTO dto = postMapper.toDTO(post, currentUser);
+
+    return ResponseEntity.ok(dto);
+}
 
     // Update Post
     @PutMapping("/{id}")

@@ -18,4 +18,6 @@ public class PostDTO {
     private int upvotes;
     private int downvotes;
     private LocalDateTime createdAt;
+    private String userVote;
+
 }

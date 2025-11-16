@@ -15,17 +15,26 @@ public class VoteService {
 
     public Vote vote(Post post, User user, String type) {
         Vote existing = voteRepository.findByUserAndPost(user, post).orElse(null);
+        Vote.VoteType voteType = Vote.VoteType.valueOf(type.toUpperCase());
 
-        if (existing != null) {
-            existing.setType(Vote.VoteType.valueOf(type.toUpperCase()));
-            return voteRepository.save(existing);
+    if (existing != null) {
+
+        // 1. If same vote → remove vote (toggle off)
+        if (existing.getType() == voteType) {
+            voteRepository.delete(existing);
+            return null;  // means no vote
         }
 
-        Vote vote = new Vote();
-        vote.setPost(post);
-        vote.setUser(user);
-        vote.setType(Vote.VoteType.valueOf(type.toUpperCase()));
-
-        return voteRepository.save(vote);
+        // 2. If switching vote
+        existing.setType(voteType);
+        return voteRepository.save(existing);
     }
+
+    // 3. If no vote exists
+    Vote vote = new Vote();
+    vote.setPost(post);
+    vote.setUser(user);
+    vote.setType(voteType);
+    return voteRepository.save(vote);
+}
 }
