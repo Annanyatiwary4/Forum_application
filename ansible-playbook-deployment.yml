@@ -1,0 +1,13 @@
+---
+- name: Deploy Forumly Stack on Kubernetes
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+    - name: Apply Forumly Kubernetes deployment
+      community.kubernetes.k8s:
+        kubeconfig: "~/.kube/config"
+        state: present
+        definition: "{{ lookup('file', 'deployement.yml') }}"

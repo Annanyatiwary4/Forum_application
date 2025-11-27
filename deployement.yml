@@ -30,7 +30,8 @@ spec:
               name: mysql-storage
       volumes:
         - name: mysql-storage
-          emptyDir: {}   # Use PVC if needed
+          persistentVolumeClaim:
+            claimName: mysql-pvc
 
 ---
 apiVersion: v1
@@ -45,6 +46,17 @@ spec:
       targetPort: 3306
   type: ClusterIP
 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
 
 # ================================
 # BACKEND
@@ -90,8 +102,8 @@ spec:
   ports:
     - port: 8081
       targetPort: 8081
-  type: ClusterIP
-
+      nodePort: 30805
+  type: NodePort
 
 # ================================
 # FRONTEND
@@ -128,4 +140,5 @@ spec:
   ports:
     - port: 80
       targetPort: 80
-  type: ClusterIP
+      nodePort: 31753
+  type: NodePort
