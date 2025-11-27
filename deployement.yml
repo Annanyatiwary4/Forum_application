@@ -1,0 +1,131 @@
+# ================================
+# MYSQL DATABASE
+# ================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forumly-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forumly-db
+  template:
+    metadata:
+      labels:
+        app: forumly-db
+    spec:
+      containers:
+        - name: forumly-db
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "annanya"
+            - name: MYSQL_DATABASE
+              value: "forumly_db"
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-storage
+      volumes:
+        - name: mysql-storage
+          emptyDir: {}   # Use PVC if needed
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forumly-db-service
+spec:
+  selector:
+    app: forumly-db
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP
+
+
+# ================================
+# BACKEND
+# ================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forumly-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forumly-backend
+  template:
+    metadata:
+      labels:
+        app: forumly-backend
+    spec:
+      containers:
+        - name: forumly-backend
+          image: annanya4/forum_application-backend:latest
+          env:
+            - name: SERVER_PORT
+              value: "8081"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://forumly-db-service:3306/forumly_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "root"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "annanya"
+          ports:
+            - containerPort: 8081
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forumly-backend-service
+spec:
+  selector:
+    app: forumly-backend
+  ports:
+    - port: 8081
+      targetPort: 8081
+  type: ClusterIP
+
+
+# ================================
+# FRONTEND
+# ================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forumly-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forumly-frontend
+  template:
+    metadata:
+      labels:
+        app: forumly-frontend
+    spec:
+      containers:
+        - name: forumly-frontend
+          image: annanya4/forum_application-frontend:latest
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forumly-frontend-service
+spec:
+  selector:
+    app: forumly-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
